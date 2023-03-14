@@ -11,15 +11,7 @@ const config = getConfig();
 const INIT_MESSAGES_PROMPT: Array<ChatCompletionRequestMessage> = [
   {
     role: ChatCompletionRequestMessageRoleEnum.System,
-    content: `You are to act as the author of a commit message in git. Your mission is to create clean and comprehensive commit messages in the conventional commit convention. I'll send you an output of 'git diff --staged' command, and you convert it into a commit message. ${
-      config?.emoji
-        ? 'Use Gitmoji convention to preface the commit'
-        : 'Do not preface the commit with anything'
-    }, use the present tense. ${
-      config?.description
-        ? 'Add a short description of what commit is about after the commit message. Don\'t start it with "This commit", just describe the changes.'
-        : "Don't add any descriptions to the commit, only commit message."
-    }`
+    content: `You are to act as the author of a commit message in git. Your mission is to create clean and comprehensive commit messages in the conventional commit convention. The message should describe the intent of the change, not the specific details of the lines changed. I'll send you an output of 'git diff --staged' command, and you convert it into a commit message.`
   },
   {
     role: ChatCompletionRequestMessageRoleEnum.User,
@@ -29,17 +21,17 @@ const INIT_MESSAGES_PROMPT: Array<ChatCompletionRequestMessage> = [
   +++ b/src/server.ts
   @@ -10,7 +10,7 @@ import {
     initWinstonLogger();
-    
+
     const app = express();
   -const port = 7799;
   +const PORT = 7799;
-    
+
     app.use(express.json());
-    
+
   @@ -34,6 +34,6 @@ app.use((_, res, next) => {
     // ROUTES
     app.use(PROTECTED_ROUTER_URL, protectedRouter);
-    
+
   -app.listen(port, () => {
   -  console.log(\`Server listening on port \${port}\`);
   +app.listen(process.env.PORT || PORT, () => {
@@ -49,9 +41,7 @@ const INIT_MESSAGES_PROMPT: Array<ChatCompletionRequestMessage> = [
   {
     role: ChatCompletionRequestMessageRoleEnum.Assistant,
     // prettier-ignore
-    content: `${config?.emoji ? '🐛 ' : ''}fix(server.ts): change port variable case from lowercase port to uppercase PORT
-${config?.emoji ? '✨ ' : ''}feat(server.ts): add support for process.env.PORT environment variable
-${config?.description ? 'The port variable is now named PORT, which improves consistency with the naming conventions as PORT is a constant. Support for an environment variable allows the application to be more flexible as it can now run on any available port specified via the process.env.PORT environment variable.' : ''}`
+    content: `feat(server): add support for process.env.PORT environment variable and rename port constant to improve naming consistency`
   }
 ];
 
